@@ -12,6 +12,27 @@ generator client {
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model Chat{
+  id String @id
+  userId String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
+  messages Message[]
+
+  user User @relation(fields: [userId], references: [id])
+}
+
+model Message{
+  id String @id
+  chatId String // foreign key
+  createdAt DateTime @default(now())
+  content String
+  role String
+
+  chat Chat @relation(fields: [chatId], references: [id])
 }
 
 model User {
@@ -27,6 +48,8 @@ model User {
 
   @@unique([email])
   @@map("user")
+
+  chats Chat[]
 }
 
 model Session {
